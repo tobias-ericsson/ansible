@@ -5,5 +5,7 @@
   vars:
      install_dir: media-server        
   roles: 
+     - shutdown
+     - sleepAndWakeup
      - xboxController
 

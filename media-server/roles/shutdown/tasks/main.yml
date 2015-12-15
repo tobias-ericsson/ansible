@@ -1,0 +1,6 @@
+---
+- copy: >
+       src=shutdown.desktop
+       dest=/home/tobias/Desktop/shutdown.desktop
+       mode=0755
+

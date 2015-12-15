@@ -1,0 +1,23 @@
+---
+- copy: >
+       src=sleepAndWakeup.sh
+       dest=/usr/local/bin/sleepAndWakeup.sh
+       mode=0755
+
+- copy: >
+       src=sleepAndWakeup.desktop
+       dest=/home/tobias/Desktop/sleepAndWakeup.desktop
+       mode=0755
+
+- cron: minute=20 hour=0 day="*"
+       user="root"
+       name="sleep and wakeup in the morning"
+       cron_file=sleep_wakeup_morning
+       job="/usr/local/bin/sleepAndWakeup.sh 08:30"
+
+- cron: minute=20 hour=10 day="*"
+       user="root"
+       name="sleep and wakeup in the evening"
+       cron_file=sleep_wakeup_evening
+       job="/usr/local/bin/sleepAndWakeup.sh 18:30"
+

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Sleep Wakeup
+Comment=/usr/local/bin/sleepAndWakeup.sh 08:30
+Exec=/usr/local/bin/sleepAndWakeup.sh 08:30
+Icon=clock
+Path=
+Terminal=false
+StartupNotify=false
+Name[en_US]=Sleep Wakeup
