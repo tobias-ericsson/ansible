@@ -1,0 +1,20 @@
+---
+- apt: name=xboxdrv state=present
+#- file: path={{install_dir}} state=directory
+#- script: configure.sh creates={{install_dir}}/configured.txt
+- copy: >
+     src=org.seul.Xboxdrv.conf
+     dest=/etc/dbus-1/system.d/org.seul.Xboxdrv.conf
+     mode=0644
+
+- copy: >
+     src=mouse.xboxdrv 
+     dest=/usr/share/doc/xboxdrv/examples/mouse2.xboxdrv 
+     mode=0644 
+- copy: >
+     src=xboxdrv.service 
+     dest=/lib/systemd/system/xboxdrv.service
+     mode=0755
+
+- command: systemctl daemon-reload     
+- service: name=xboxdrv state=restarted

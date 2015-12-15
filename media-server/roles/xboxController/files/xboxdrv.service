@@ -1,0 +1,15 @@
+[Unit]
+Description=xboxdrv
+
+[Service]
+#Type=forking
+PIDFile=/run/xboxdrv.pid
+#ExecStartPre=/usr/sbin/
+ExecStart=/usr/bin/xboxdrv --daemon --detach --detach-kernel-driver --config /usr/share/doc/xboxdrv/examples/mouse2.xboxdrv
+#ExecReload=
+#ExecStop=
+#TimeoutStopSec=5
+#KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+---
+- hosts: media-servers
+  sudo: yes
+  user: tobias
+  vars:
+     install_dir: media-server        
+  roles: 
+     - xboxController
+
