@@ -1,0 +1,71 @@
+#Made for AWS poc
+#usage user=root or centos
+#ansible-playbook -i inventory/ec2.py aws.yml -u root
+---
+- name: Create aws instances
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ec2_access_key:
+    ec2_secret_key:
+    ec2_region: eu-central-1
+    ec2_image: ami-e68f82fb
+    ec2_instance_type: t2.micro
+    ec2_keypair: ec2_frankfurt
+    ec2_security_group: sg-6661410f
+    ec2_vpc_subnet_id: subnet-869b0dfd
+    
+  vars_prompt:
+     ec2_instance_count: "How many instances"
+     ec2_tag_name: "Tag Name"
+     ec2_tag_ansible_group: "Tag ansible_group"
+     ec2_tag_ansible_role: "Tag ansible_role"
+  
+  tasks:
+  - name: Launch ec2 instances
+    ec2:
+      aws_access_key: "{{ ec2_access_key }}"
+      aws_secret_key: "{{ ec2_secret_key }}"
+      key_name: "{{ ec2_keypair }}"
+      group_id: "{{ ec2_security_group }}"
+      instance_type: "{{ ec2_instance_type }}"
+      image: "{{ ec2_image }}"
+      region: "{{ ec2_region }}"
+      instance_tags:
+        Name: '{{ ec2_tag_name }}'
+        ansible_group: '{{ ec2_tag_ansible_group }}'
+        ansible_role: '{{ ec2_tag_ansible_role }}'
+        type: '{{ ec2_instance_type }}'
+        group: '{{ ec2_security_group }}'
+      count: "{{ ec2_instance_count }}"
+      vpc_subnet_id: "{{ ec2_vpc_subnet_id }}"
+      wait: true
+    register: ec2
+
+  - debug: msg="created host={{item.public_dns_name}} ip={{item.public_ip}}"
+    with_items: ec2.instances
+
+  - name: Wait for the AWS instances to boot by checking the ssh port
+    wait_for: host="{{item.public_dns_name}}" port=22 delay=60 timeout=320 state=started
+    with_items: ec2.instances
+
+  - name: Add the AWS instances to hostgroup 'aws_instances'
+    add_host: hostname="{{item.public_ip}}" groupname=aws_instances
+    with_items: ec2.instances
+
+# This play targets the new host group
+- name: Configure instance
+  hosts: aws_instances
+  remote_user: centos
+  become: True
+  gather_facts: True
+
+# Do some stuff on each instance ....
+  tasks:
+    - lineinfile: dest=/etc/hosts regexp='^.* {{ ansible_hostname }}.*' line='{{ ansible_all_ipv4_addresses[0] }} {{ ansible_hostname }}'
+    - name: install EPEL repo
+      yum: name=epel-release state=present
+    - name: upgrade all packages
+      yum: name=* state=latest
+

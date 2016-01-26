@@ -1,0 +1,42 @@
+#run: ansible-playbook ec2-provision.yml -u centos
+- name: Configure instance
+  hosts: tag_ansible_group_web
+  remote_user: centos
+  become: True
+  gather_facts: True
+
+  vars:
+
+  tasks:
+    - name: install EPEL repo
+      yum: name=epel-release state=present
+
+    - name: Install packages
+      yum: name={{ item }} state=present
+      with_items:
+        - curl
+        - unzip
+
+    - lineinfile: dest=/etc/hosts regexp='^.* {{ ansible_hostname }}.*' line='{{ ansible_all_ipv4_addresses[0] }} {{ ansible_hostname }}'
+
+    - name: install EPEL repo
+      yum: name=epel-release state=present
+
+### START JAVA 8
+    - get_url: url="http://download.oracle.com/otn-pub/java/jdk/8u71-b15/jdk-8u71-linux-x64.tar.gz" dest=/usr/lib/jvm/ headers='Cookie:oraclelicense=accept-securebackup-cookie'
+
+    - unarchive: src=/usr/lib/jvm/jdk-8u71-linux-x64.tar.gz
+                 dest=/usr/lib/jvm
+                 copy=no
+                 creates=/usr/lib/jvm/jdk1.8.0_71
+
+    - command: 'alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.8.0_71/bin/java" 2000'
+
+    - alternatives: name=java path=/usr/lib/jvm/jdk1.8.0_71/bin/java
+### END JAVA 8
+
+- hosts: webservers
+  roles:
+
+- hosts: loadbalancers
+  roles:
