@@ -1,6 +1,6 @@
 #run: ansible-playbook ec2-provision.yml -u centos
-- name: Configure instance
-  hosts: tag_ansible_group_web
+- name: Configure instances
+  hosts: tag_ansible_group_web, tag_ansible_group_loadbalancer
   remote_user: centos
   become: True
   gather_facts: True
@@ -8,6 +8,11 @@
   vars:
 
   tasks:
+    - authorized_key: user=root key="{{ lookup('file', '/home/tobias.ericsson/.ssh/id_rsa.pub') }}"
+    - selinux: state=disabled
+    #- command: systemctl stop firewalld
+    #- command: systemctl disable firewalld
+    
     - name: install EPEL repo
       yum: name=epel-release state=present
 
@@ -16,27 +21,30 @@
       with_items:
         - curl
         - unzip
+        - wget
+        - nmap
+        - firewalld
+
+    - service: name=firewalld state=started
+    - firewalld: service=https permanent=true state=enabled
+    - firewalld: port=8080/tcp permanent=true state=enabled
+    - firewalld: port=80/tcp permanent=true state=enabled
+    - firewalld: port=6379/tcp permanent=true state=enabled
+    - service: name=firewalld state=restarted
 
     - lineinfile: dest=/etc/hosts regexp='^.* {{ ansible_hostname }}.*' line='{{ ansible_all_ipv4_addresses[0] }} {{ ansible_hostname }}'
 
-    - name: install EPEL repo
-      yum: name=epel-release state=present
-
-### START JAVA 8
-    - get_url: url="http://download.oracle.com/otn-pub/java/jdk/8u71-b15/jdk-8u71-linux-x64.tar.gz" dest=/usr/lib/jvm/ headers='Cookie:oraclelicense=accept-securebackup-cookie'
-
-    - unarchive: src=/usr/lib/jvm/jdk-8u71-linux-x64.tar.gz
-                 dest=/usr/lib/jvm
-                 copy=no
-                 creates=/usr/lib/jvm/jdk1.8.0_71
-
-    - command: 'alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.8.0_71/bin/java" 2000'
-
-    - alternatives: name=java path=/usr/lib/jvm/jdk1.8.0_71/bin/java
-### END JAVA 8
-
-- hosts: webservers
+- name: Configure web-instances
+  hosts: tag_ansible_group_web
+  remote_user: centos
+  become: True
+  gather_facts: False
   roles:
+     - java
+     - spring-boot
 
-- hosts: loadbalancers
+- name: Configure loadbalancers
+  hosts: tag_ansible_group_loadbalancer
+  remote_user: centos
+  become: True
   roles:

@@ -1,0 +1,7 @@
+---
+- file: path=/usr/share/spring-boot state=directory
+
+- copy: src=/home/tobias.ericsson/dev/me/spring-boot-test/target/test-0.0.1-SNAPSHOT.jar
+        dest=/usr/share/spring-boot/spring-boot-test.jar
+        owner=root 
+        group=root 
