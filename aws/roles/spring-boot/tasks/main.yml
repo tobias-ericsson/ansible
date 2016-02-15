@@ -4,4 +4,11 @@
 - copy: src=/home/tobias.ericsson/dev/me/spring-boot-test/target/test-0.0.1-SNAPSHOT.jar
         dest=/usr/share/spring-boot/spring-boot-test.jar
         owner=root 
-        group=root 
+        group=root
+        mode=0500
+
+- file: src=/usr/share/spring-boot/spring-boot-test.jar dest=/etc/init.d/spring-boot-test state=link
+
+- lineinfile: dest=/etc/hosts regexp='^.* redis.spring-boot.*' line='172.31.31.133 redis.spring-boot'
+
+- service: name=spring-boot-test state=restarted

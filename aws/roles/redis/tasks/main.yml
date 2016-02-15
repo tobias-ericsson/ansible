@@ -1,0 +1,16 @@
+---
+- yum: name=redis state=present
+
+- name: copy configuration file
+  template: >
+      src=redis-sentinel.conf
+      dest=/etc/redis-sentinel.conf
+      owner=redis
+      group=redis
+      mode=0644
+
+#- lineinfile: dest=/etc/hosts regexp='^.* redis.spring-boot.*' line='172.31.31.133 redis.spring-boot'
+
+- service: name=redis state=restarted enabled=yes
+
+- service: name="redis-sentinel" state=restarted enabled=yes

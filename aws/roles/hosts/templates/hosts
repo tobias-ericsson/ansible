@@ -1,0 +1,15 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+{{ ansible_all_ipv4_addresses[0] }} {{ ansible_hostname }}
+
+{% for host in groups['tag_ansible_group_loadbalancer'] %}
+{{hostvars[host]['ec2_private_ip_address']}} {{hostvars[host]['ec2_tag_Name']}} 
+{% endfor %}
+
+{% for host in groups['tag_ansible_group_web'] %}
+{{hostvars[host]['ec2_private_ip_address']}} {{hostvars[host]['ec2_tag_Name']}}
+{{hostvars[host]['ec2_private_ip_address']}} {{hostvars[host]['ec2_tag_Name'] | regex_replace('web','redis')}}
+{% endfor %}
+
+172.31.24.92 ip-172-31-24-92
+172.31.31.133 redis.spring-boot

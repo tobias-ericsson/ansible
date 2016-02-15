@@ -30,6 +30,7 @@
     - firewalld: port=8080/tcp permanent=true state=enabled
     - firewalld: port=80/tcp permanent=true state=enabled
     - firewalld: port=6379/tcp permanent=true state=enabled
+    - firewalld: port=5000/tcp permanent=true state=enabled
     - service: name=firewalld state=restarted
 
     - lineinfile: dest=/etc/hosts regexp='^.* {{ ansible_hostname }}.*' line='{{ ansible_all_ipv4_addresses[0] }} {{ ansible_hostname }}'
@@ -40,11 +41,15 @@
   become: True
   gather_facts: False
   roles:
-     - java
-     - spring-boot
+     - { role: java, tags: java }
+     - { role: hosts, tags: hosts }
+     - { role: redis, tags: redis }
+     - { role: spring-boot, tags: spring-boot }
 
 - name: Configure loadbalancers
   hosts: tag_ansible_group_loadbalancer
   remote_user: centos
   become: True
+  gather_facts: False
   roles:
+     - nginx

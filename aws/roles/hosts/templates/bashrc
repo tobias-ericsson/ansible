@@ -1,0 +1,20 @@
+# .bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+function proml {
+ PS1="{{ hostvars[inventory_hostname]['ec2_tag_Name'] }} \[$(tput sgr0)\]\[\033[38;5;136m\]\h\[$(tput sgr0)\]\[\033[38;5;15m\] [\[$(tput sgr0)\]\[\033[38;5;136m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]]\[$(tput sgr0)\]\[\033[0;32m\]\[$(tput sgr0)\]\\$ "
+ PS2='> '
+ PS4='+ '
+}
+proml
+

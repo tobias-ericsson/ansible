@@ -1,0 +1,14 @@
+---
+- name: copy bashrc file
+  template: >
+      src=bashrc
+      dest=~/.bashrc
+      mode=0722
+
+- name: copy hosts file
+  template: >
+      src=hosts
+      dest=/etc/hosts
+      owner=root
+      group=root
+      mode=0644
