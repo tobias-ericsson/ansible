@@ -1,0 +1,20 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+{{ ansible_all_ipv4_addresses[0] }} {{ ansible_hostname }}
+{% if groups['tag_ansible_group_loadbalancer'] is defined -%}
+    {% for host in groups['tag_ansible_group_loadbalancer'] %}
+        {{hostvars[host]['ec2_private_ip_address']}} {{hostvars[host]['ec2_tag_Name']}}
+    {% endfor %}
+{% endif %}
+
+{% for host in groups['tag_ansible_group_web']%}
+{{hostvars[host]['ec2_private_ip_address']}} sc{{loop.index}}
+{{hostvars[host]['ec2_private_ip_address']}} cc{{loop.index}}
+{{hostvars[host]['ec2_private_ip_address']}} {{hostvars[host]['ec2_tag_Name']}}
+{{hostvars[host]['ec2_private_ip_address']}} {{hostvars[host]['ec2_tag_Name'] | regex_replace('web','redis')}}
+{%endfor %}
+{#{% for host in groups['tag_ansible_role_mongodb_true'] %}
+#{{hostvars[host]['ec2_private_ip_address']}} redis{{loop.index}}
+#{{hostvars[host]['ec2_private_ip_address']}} mongodb{{loop.index}}
+#{% endfor %}#}
+

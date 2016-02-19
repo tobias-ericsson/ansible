@@ -9,7 +9,8 @@
       group=redis
       mode=0644
 
-#- lineinfile: dest=/etc/hosts regexp='^.* redis.spring-boot.*' line='172.31.31.133 redis.spring-boot'
+
+- lineinfile: dest=/etc/redis.conf regexp='^.* bind 127.0.0.1*' line='bind 0.0.0.0'
 
 - service: name=redis state=restarted enabled=yes
 

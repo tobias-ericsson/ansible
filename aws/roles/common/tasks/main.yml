@@ -1,11 +1,18 @@
 ---
-- name: copy bashrc file
+- name: copy .bashrc
   template: >
       src=bashrc
       dest=~/.bashrc
       mode=0722
 
-- name: copy hosts file
+- yum: name=vim state=present
+- name: copy .vimrc
+  template: >
+      src=vimrc
+      dest=~/.vimrc
+      mode=0722
+
+- name: copy hosts
   template: >
       src=hosts
       dest=/etc/hosts
